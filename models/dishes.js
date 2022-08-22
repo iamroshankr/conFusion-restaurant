@@ -25,7 +25,7 @@ const commentSchema = new Schema({
 const dishSchema = new Schema({
     name: {
         type: String,
-        required: true,
+        required: [ true, "Missing Name Field!" ],
         unique: true
     },
     description: {

@@ -7,7 +7,7 @@ const Currency = mongoose.Types.Currency;
 const promoSchema = new Schema({
     name: {
         type: String,
-        required: true,
+        required: [ true, "Missing Name Field!" ],
         unique: true
     },
     image: {

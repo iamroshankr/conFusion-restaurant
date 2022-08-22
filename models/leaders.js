@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const leaderSchema = new Schema({
     name: {
         type: String,
-        required: true,
+        required: [ true, "Missing Name Field!" ],
         unique: true
     },
     image: {
