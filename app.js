@@ -1,7 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+// var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session); //takes session as parameter
@@ -42,47 +42,24 @@ app.use(session({
   store: new FileStore()
 }));
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter); //these two endpoints can be used without authentication
+
 function auth(req, res, next) {
   console.log(req.session);
 
   if(!req.session.user) {
 
-    var authHeader = req.headers.authorization;
-
-    if(!authHeader) {
-      var err = new Error('You are not authenticated!');
-  
-      res.setHeader('WWW-Authenticate', 'Basic');
-      err.status = 401;
-      return next(err);
-    }
-  
-    //picking up the encoded base64 string to get username and password
-    var authString = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    var username = authString[0];
-    var password = authString[1];
-  
-    if(username === 'admin' && password === 'password') {
-      
-      req.session.user = 'admin';
-
-      next();
-    }
-    else {
-      var err = new Error('You are not authenticated!');
-  
-      res.setHeader('WWW-Authenticate', 'Basic');
-      err.status = 401;
-      return next(err);
-    }
+    var err = new Error('You are not authenticated!');
+    err.status = 401;
+    return next(err);
   }
   else {
-    if(req.session.user === 'admin') {
+    if(req.session.user === 'authenticated') {
       next();
     }
     else {
       var err = new Error('You are not authenticated!');
-  
       err.status = 401;
       return next(err);
     }
@@ -93,8 +70,6 @@ app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
