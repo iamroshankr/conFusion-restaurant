@@ -7,8 +7,23 @@ var router = express.Router();
 router.use(express.json());
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+  
+  User.find({}, (err, users) => {
+    if(err) {
+      next(err);
+    }
+    else if(!users) {
+      const error = new Error('No users found!');
+      error.status = 404;
+      next(error);
+    }
+    else {
+      res.status = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(users);
+    }
+  });
 });
 
 router.post('/signup', function(req, res) {

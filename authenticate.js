@@ -44,7 +44,14 @@ module.exports.jwtPassport = passport.use(new JwtStrategy(opts,
 );
 
 module.exports.verifyUser = passport.authenticate('jwt', {session: false});
-// the line above uses the tokens that comes in to verify the user
 
-//first we authenticate a user using local strategy usr/pwd
-//then we create a token and issue it for all subsequent requests
+module.exports.verifyAdmin = (req, res, next) => {
+    if(!req.user.admin) {
+        const err = new Error("You are not authorized to perform this operation!");
+        err.status = 403;
+        next(err);
+    }
+    else {
+        next();
+    }
+};
