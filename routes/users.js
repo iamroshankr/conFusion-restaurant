@@ -2,12 +2,13 @@ const express = require('express');
 const User = require('../models/user');
 const passport = require('passport');
 const authenticate  = require('../authenticate');
+const cors = require('./cors');
 
 var router = express.Router();
 router.use(express.json());
 
 /* GET users listing. */
-router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   
   User.find({}, (err, users) => {
     if(err) {
@@ -26,7 +27,7 @@ router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, ne
   });
 });
 
-router.post('/signup', function(req, res) {
+router.post('/signup', cors.corsWithOptions, function(req, res) {
 
   User.register(new User({username: req.body.username}),
     req.body.password,
@@ -61,7 +62,7 @@ router.post('/signup', function(req, res) {
   );
 });
 
-router.post('/login', passport.authenticate('local', {session: false}), (req, res) => {
+router.post('/login', cors.corsWithOptions, passport.authenticate('local', {session: false}), (req, res) => {
 
   const token = authenticate.getToken({ _id: req.user._id });
   // keep minimum info in the token
@@ -71,7 +72,7 @@ router.post('/login', passport.authenticate('local', {session: false}), (req, re
   res.json({success: true, token: token, status: 'You are Successfully logged in!'});  
 });
 
-router.get('/logout', (req, res, next) => {
+router.get('/logout', cors.corsWithOptions, (req, res, next) => {
   if(req.session) {
     req.session.destroy(); //deletes the session from the server side
     res.clearCookie('session-id'); //asking the client to delete the cookie
