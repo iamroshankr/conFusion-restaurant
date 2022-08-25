@@ -28,7 +28,6 @@ opts.secretOrKey = config.secretKey;
 
 module.exports.jwtPassport = passport.use(new JwtStrategy(opts, 
     (jwt_payload, done) => {
-        console.log("JWT Payload: ", jwt_payload);
         User.findOne({_id: jwt_payload._id}, (err, user) => {
             if(err) {
                 return done(err, false);
